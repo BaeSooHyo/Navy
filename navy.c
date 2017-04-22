@@ -1,13 +1,12 @@
 #include "command.h"
 #include "intel.h"
 
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <assert.h>
 
-#define BUFSIZE 256
 
 
 /*
@@ -20,23 +19,8 @@ y : 0-9
 */
 
 
-int main(int argc, char const *argv[]) {
-  struct sequence blitzkrieg;
-  sequence_create(&blitzkrieg);
-  sequence_add_back(&blitzkrieg, 1, 1 ,POLL);
-  sequence_add_back(&blitzkrieg, 1, 4 ,POLL);
-  sequence_add_back(&blitzkrieg, 1, 7 ,POLL);
-  sequence_add_back(&blitzkrieg, 4, 7 ,POLL);
-  sequence_add_back(&blitzkrieg, 4, 4 ,POLL);
-  sequence_add_back(&blitzkrieg, 4, 1 ,POLL);
-  sequence_add_back(&blitzkrieg, 7, 1 ,POLL);
-  sequence_add_back(&blitzkrieg, 7, 4 ,POLL);
-  sequence_add_back(&blitzkrieg, 7, 7 ,POLL);
-  sequence_add_back(&blitzkrieg, 9, 1 ,SHOOT);
-  sequence_add_back(&blitzkrieg, 9, 3 ,SHOOT);
-  sequence_add_back(&blitzkrieg, 9, 5 ,SHOOT);
-  sequence_add_back(&blitzkrieg, 9, 7 ,SHOOT);
-
+int main(int argc, char const *argv[])
+{
   setbuf(stdout, NULL);
   char buffer[BUFSIZE];
   struct coord radar;
@@ -51,6 +35,7 @@ int main(int argc, char const *argv[]) {
   set_mine(&ennemy, 7, 9);
   set_mine(&ennemy, 9, 9);
 
+//TODO Placer bateaux
 
   // ships
   printf("B2B6\n");
@@ -64,21 +49,39 @@ int main(int argc, char const *argv[]) {
   printf("I0I1\n");
   fgets(buffer, BUFSIZE, stdin);
 
+  //plan
+  struct sequence blitzkrieg;
+  sequence_create(&blitzkrieg);
+  sequence_add_back(&blitzkrieg, POLL,  1, 1);
+  sequence_add_back(&blitzkrieg, POLL,  1, 4);
+  sequence_add_back(&blitzkrieg, POLL,  1, 7);
+  sequence_add_back(&blitzkrieg, POLL,  4, 7);
+  sequence_add_back(&blitzkrieg, POLL,  4, 4);
+  sequence_add_back(&blitzkrieg, POLL,  4, 1);
+  sequence_add_back(&blitzkrieg, POLL,  7, 1);
+  sequence_add_back(&blitzkrieg, POLL,  7, 4);
+  sequence_add_back(&blitzkrieg, POLL,  7, 7);
+  sequence_add_back(&blitzkrieg, SHOOT, 9, 1);
+  sequence_add_back(&blitzkrieg, SHOOT, 9, 3);
+  sequence_add_back(&blitzkrieg, SHOOT, 9, 5);
+  sequence_add_back(&blitzkrieg, SHOOT, 9, 7);
+  struct sequence_node *current_attack = blitzkrieg.first;
+  struct position_info info;
+  position_info_create(&info);
 
-  process(blitzkrieg.first);
-
-
-
-  for (size_t i = 0; ; i++)
+  while(strcmp(buffer, "START\n"))
   {
-    // printf("SHOOT\n"); // SHOOT or POLL or MOVE
-    // printf("D2\n");
     fgets(buffer, BUFSIZE, stdin);
     fprintf(stderr, "%s", buffer);
-    process(blitzkrieg.first);
-    fgets(buffer, BUFSIZE, stdin); // NOTHING or ATTACK
-    fprintf(stderr, "%s\n", buffer);
-    //TODO Récupérer infos ici
+  }
+
+  for (size_t i = 1; ; i++)
+  {
+    //FIXME Reset ne fonctionne pas
+    fprintf(stderr, "%d\n", current_attack );
+    fprintf(stderr, "\nRound %lu : \n", i);
+    process(&current_attack, &info, buffer);
+    if (current_attack == NULL){current_attack = blitzkrieg.first;}
   }
   return EXIT_SUCCESS;
 }

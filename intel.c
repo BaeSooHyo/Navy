@@ -12,12 +12,21 @@ void map_create(struct map *self)
   }
 }
 
-
 void set_coord(struct coord *self, int x, int y)
 {
-  if ((0 <= x && x < 10)&&(0 <= y && y < 10))
-  {
   self->x = x;
   self->y = y;
-  }
+}
+
+void position_info_create(struct position_info *self)
+{
+  self->coord = malloc(sizeof(struct coord));
+  position_info_init(self);
+}
+
+void position_info_init(struct position_info *self)
+{
+  self->N = self->E = self->W = self->S = 1;
+  set_coord(self->coord, -1, -1);
+  self->center_shot = false;
 }
