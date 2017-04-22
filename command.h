@@ -24,6 +24,7 @@ struct sequence_node
 struct sequence
 {
   struct sequence_node *first;
+  struct sequence_node *current;
 };
 
 void sequence_create(struct sequence *self);
@@ -32,6 +33,6 @@ void send_coord_explicit(int x, int y);
 void send_coord(struct coord *self);
 void send_coord_relative(struct coord *self, int x, int y);
 void set_mine(struct map *self, int x, int y);
-void process(struct sequence_node **sequence, struct position_info *info, char buffer[BUFSIZE]);
+void process(struct sequence *sequence, struct position_info *info, struct map *map, char buffer[BUFSIZE]);
 
 #endif

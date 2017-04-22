@@ -4,7 +4,7 @@
 
 void sequence_create(struct sequence *self)
 {
-  self->first = NULL;
+  self->first = self->current = NULL;
 };
 
 void sequence_add_back(struct sequence *self, enum action action, int x, int y)
@@ -20,6 +20,7 @@ void sequence_add_back(struct sequence *self, enum action action, int x, int y)
   if (curr == NULL)
   {
     self->first = new;
+    self->current = self->first;
     return;
   }
   while (curr->next != NULL)
@@ -56,11 +57,12 @@ void set_mine(struct map *self, int x, int y)
   send_coord_explicit(x,y);
 }
 
-void process(struct sequence_node **sequence, struct position_info *info, char buffer[BUFSIZE])
+void process(struct sequence *sequence, struct position_info *info, struct map *map, char buffer[BUFSIZE])
 {
-  if (info->coord->x - info->N < 0){info->N = -1;}
+  if (sequence->current == NULL){sequence->current = sequence->first;}
+  if (info->coord->y - info->N < 0){info->N = -1;}
   if (info->coord->x + info->E > 9){info->E = -1;}
-  if (info->coord->x + info->S > 9){info->S = -1;}
+  if (info->coord->y + info->S > 9){info->S = -1;}
   if (info->coord->x - info->W < 0){info->W = -1;}
   if (info->N == -1 && info->S == -1 && info->E == -1 && info->W == -1)
   {
@@ -72,23 +74,25 @@ void process(struct sequence_node **sequence, struct position_info *info, char b
 
   if (info->coord->x == -1 && info->coord->y == -1)
   {
-    switch ((*sequence)->action)
+    switch (sequence->current->action)
     {
       case SHOOT:
       {
         printf("SHOOT\n");
         fprintf(stderr, "SHOOT ");
-        send_coord((*sequence)->target);
-        if ((*sequence)->next == NULL){fprintf(stderr, "lalalalla\n" );}
-        *sequence = (*sequence)->next;
+        send_coord(sequence->current->target);
         fgets(buffer, BUFSIZE, stdin);
         fprintf(stderr, "%s", buffer);
         if (strcmp(buffer, "MISS\n"))
         {
-          info->coord->x = (*sequence)->target->x;
-          info->coord->y = (*sequence)->target->y;
+          info->coord->x = sequence->current->target->x;
+          info->coord->y = sequence->current->target->y;
           info->center_shot = true;
           fprintf(stderr, "Démarrage de la procédure de destruction\n");
+        }
+        else
+        {
+          sequence->current = sequence->current->next;
         }
       }
       break;
@@ -97,8 +101,7 @@ void process(struct sequence_node **sequence, struct position_info *info, char b
       {
         printf("POLL\n");
         fprintf(stderr, "POLL ");
-        send_coord((*sequence)->target);
-        *sequence = (*sequence)->next;
+        send_coord(sequence->current->target);
         fgets(buffer, BUFSIZE, stdin);
         fprintf(stderr, "%s", buffer);
         if (strcmp(buffer ,"EMPTY\n"))
@@ -110,6 +113,10 @@ void process(struct sequence_node **sequence, struct position_info *info, char b
           info->center_shot = false;
           fprintf(stderr, "Démarrage de la procédure de destruction\n");
         }
+        else
+        {
+          sequence->current = sequence->current->next;
+        }
       }
       break;
 
@@ -117,8 +124,8 @@ void process(struct sequence_node **sequence, struct position_info *info, char b
       {
         printf("MOVE\n");
         fprintf(stderr, "MOVE ");
-        send_coord((*sequence)->target);
-        *sequence = (*sequence)->next;
+        send_coord(sequence->current->target);
+        sequence->current = sequence->current->next;
       }
       break;
     }
@@ -144,25 +151,11 @@ void process(struct sequence_node **sequence, struct position_info *info, char b
       if (!strcmp(buffer, "HIT\n"))
       {
         info->N++;
+        info->W = info->E = -1;
       }
       else
       {
         info->N = -1;
-      }
-    }
-    else if (info->S > -1)
-    {
-      printf("SHOOT\n");
-      send_coord_relative(info->coord, 0, +info->S);
-      fgets(buffer, BUFSIZE, stdin);
-      fprintf(stderr, "%s", buffer);
-      if (!strcmp(buffer, "HIT\n"))
-      {
-        info->S++;
-      }
-      else
-      {
-        info->S = -1;
       }
     }
     else if (info->E > -1)
@@ -174,10 +167,27 @@ void process(struct sequence_node **sequence, struct position_info *info, char b
       if (!strcmp(buffer, "HIT\n"))
       {
         info->E++;
+        info->N = info->S = -1;
       }
       else
       {
         info->E = -1;
+      }
+    }
+    else if (info->S > -1)
+    {
+      printf("SHOOT\n");
+      send_coord_relative(info->coord, 0, +info->S);
+      fgets(buffer, BUFSIZE, stdin);
+      fprintf(stderr, "%s", buffer);
+      if (!strcmp(buffer, "HIT\n"))
+      {
+        info->S++;
+        info->W = info->E = -1;
+      }
+      else
+      {
+        info->S = -1;
       }
     }
     else if (info->W > -1)
@@ -197,11 +207,10 @@ void process(struct sequence_node **sequence, struct position_info *info, char b
     }
     else
     {
-      fprintf(stderr, "GROSSE ERREUR ICI\n");
+      fprintf(stderr, "Error\n");
       printf("SHOOT\n");
       printf("A0\n");
     }
-    //TODO Limiter recherche horizontale/verticale si trouvé
   }
 
   fprintf(stderr, "Informations de l'ennemi : \n" );
