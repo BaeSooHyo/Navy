@@ -16,6 +16,9 @@ y : 0-9
 3 actions : SHOOT POLL MOVE
 */
 
+//TODO Gérer signal SIGINT
+//TODO fonctions destroy (sequence, sequence_node, map, position_info)
+
 int main(int argc, char const *argv[])
 {
   setbuf(stdout, NULL);
@@ -25,42 +28,56 @@ int main(int argc, char const *argv[])
   map_create(&ennemy_navy);
 
   // mines
-  set_mine(&ennemy_navy, 1, 9);
-  set_mine(&ennemy_navy, 3, 9);
-  set_mine(&ennemy_navy, 5, 9);
-  set_mine(&ennemy_navy, 7, 9);
-  set_mine(&ennemy_navy, 9, 9);
+  set_mine(&ennemy_navy, 0, 9);
+  set_mine(&ennemy_navy, 2, 9);
+  set_mine(&ennemy_navy, 4, 9);
+  set_mine(&ennemy_navy, 6, 9);
+  set_mine(&ennemy_navy, 8, 9);
 
-//TODO Placer bateaux efficacement
-
-  // ships
-  printf("B2B6\n");
+  printf("H0H4\n");
   fgets(buffer, BUFSIZE, stdin);
-  printf("E8H8\n");
+  printf("C5F5\n");
   fgets(buffer, BUFSIZE, stdin);
-  printf("D1F1\n");
+  printf("E6E8\n");
   fgets(buffer, BUFSIZE, stdin);
-  printf("G5I5\n");
+  printf("C6C8\n");
   fgets(buffer, BUFSIZE, stdin);
-  printf("I0I1\n");
+  printf("I2I3\n");
   fgets(buffer, BUFSIZE, stdin);
 
   //plan d'attaque
   struct sequence blitzkrieg;
   sequence_create(&blitzkrieg);
-  sequence_add_back(&blitzkrieg, POLL,  1, 1);  //B1
-  sequence_add_back(&blitzkrieg, POLL,  1, 4);  //B4
-  sequence_add_back(&blitzkrieg, POLL,  1, 7);  //B7
-  sequence_add_back(&blitzkrieg, POLL,  4, 7);  //E7
-  sequence_add_back(&blitzkrieg, POLL,  4, 4);  //E4
-  sequence_add_back(&blitzkrieg, POLL,  4, 1);  //E1
-  sequence_add_back(&blitzkrieg, POLL,  7, 1);  //H1
-  sequence_add_back(&blitzkrieg, POLL,  7, 4);  //H4
-  sequence_add_back(&blitzkrieg, POLL,  7, 7);  //H7
-  sequence_add_back(&blitzkrieg, SHOOT, 9, 1);  //J1
-  sequence_add_back(&blitzkrieg, SHOOT, 9, 3);  //J3
-  sequence_add_back(&blitzkrieg, SHOOT, 9, 5);  //J5
-  sequence_add_back(&blitzkrieg, SHOOT, 9, 7);  //J7
+
+  // sequence_add_back(&blitzkrieg, POLL,  1, 1);  //B1
+  // sequence_add_back(&blitzkrieg, POLL,  1, 4);  //B4
+  // sequence_add_back(&blitzkrieg, POLL,  1, 7);  //B7
+  // sequence_add_back(&blitzkrieg, POLL,  4, 7);  //E7
+  // sequence_add_back(&blitzkrieg, POLL,  4, 4);  //E4
+  // sequence_add_back(&blitzkrieg, POLL,  4, 1);  //E1
+  // sequence_add_back(&blitzkrieg, POLL,  7, 1);  //H1
+  // sequence_add_back(&blitzkrieg, POLL,  7, 4);  //H4
+  // sequence_add_back(&blitzkrieg, POLL,  7, 7);  //H7
+  // sequence_add_back(&blitzkrieg, SHOOT, 9, 1);  //J1
+  // sequence_add_back(&blitzkrieg, SHOOT, 9, 3);  //J3
+  // sequence_add_back(&blitzkrieg, SHOOT, 9, 5);  //J5
+  // sequence_add_back(&blitzkrieg, SHOOT, 9, 7);  //J7
+
+
+  sequence_add_back(&blitzkrieg, POLL,  8, 1);  //I1
+  sequence_add_back(&blitzkrieg, POLL,  8, 4);  //I4
+  sequence_add_back(&blitzkrieg, POLL,  8, 7);  //I7
+  sequence_add_back(&blitzkrieg, POLL,  5, 7);  //F7
+  sequence_add_back(&blitzkrieg, POLL,  5, 4);  //F4
+  sequence_add_back(&blitzkrieg, POLL,  5, 1);  //F1
+  sequence_add_back(&blitzkrieg, POLL,  2, 1);  //C1
+  sequence_add_back(&blitzkrieg, POLL,  2, 4);  //C4
+  sequence_add_back(&blitzkrieg, POLL,  2, 7);  //C7
+  sequence_add_back(&blitzkrieg, SHOOT, 0, 7);  //A7
+  sequence_add_back(&blitzkrieg, SHOOT, 0, 5);  //A5
+  sequence_add_back(&blitzkrieg, SHOOT, 0, 3);  //A3
+  sequence_add_back(&blitzkrieg, SHOOT, 0, 1);  //A1
+
   struct position_info info;
   position_info_create(&info);
 

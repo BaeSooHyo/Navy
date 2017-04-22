@@ -61,10 +61,10 @@ void process(struct sequence *sequence, struct position_info *info, struct map *
   if (info->coord->x + info->E > 9){info->E = -1;}
   if (info->coord->y + info->S > 9){info->S = -1;}
   if (info->coord->x - info->W < 0){info->W = -1;}
-  if (!map_shootable(map, info->coord->x, info->coord->y - info->N)){info->N = -1;}
-  if (!map_shootable(map, info->coord->x, info->coord->y + info->S)){info->S = -1;}
-  if (!map_shootable(map, info->coord->x - info->E, info->coord->y)){info->E = -1;}
-  if (!map_shootable(map, info->coord->x + info->W, info->coord->y)){info->W = -1;}
+  if (!map_shootable(map, info->coord->x, info->coord->y - info->N)){fprintf(stderr, "interruption recherche nord \n");info->N = -1;}
+  if (!map_shootable(map, info->coord->x, info->coord->y + info->S)){fprintf(stderr, "interruption recherche sud  \n");info->S = -1;}
+  if (!map_shootable(map, info->coord->x - info->E, info->coord->y)){fprintf(stderr, "interruption recherche est  \n");info->E = -1;}
+  if (!map_shootable(map, info->coord->x + info->W, info->coord->y)){fprintf(stderr, "interruption recherche ouest\n");info->W = -1;}
   if (info->N == -1 && info->S == -1 && info->E == -1 && info->W == -1)
   {
     position_info_init(info);
@@ -89,10 +89,7 @@ void process(struct sequence *sequence, struct position_info *info, struct map *
           info->center_shot = true;
           fprintf(stderr, "Démarrage de la procédure de destruction\n");
         }
-        else
-        {
-          sequence->current = sequence->current->next;
-        }
+        sequence->current = sequence->current->next;
       }
       break;
 
