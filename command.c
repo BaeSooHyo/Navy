@@ -12,8 +12,7 @@ void sequence_add_back(struct sequence *self, enum action action, int x, int y)
   struct sequence_node *curr = self->first;
   struct sequence_node *new = malloc(sizeof (struct sequence_node));
   new->target = malloc(sizeof(struct coord));
-  new->target->x = x;
-  new->target->y = y;
+  coord_set(new->target, x, y);
   new->action = action;
   new->next = NULL;
 
@@ -49,13 +48,11 @@ void send_coord_relative(struct coord *self, int x, int y)
 
 void set_mine(struct map *self, int x, int y)
 {
-  if (!((0 <= x && x < 10)&&(0 <= y && y < 10)))
-  {
-    x = 2; y = 2;
-  }
-  self->map[x][y] = MINE;
   send_coord_explicit(x,y);
+  map_set_mine(self, x, y);
 }
+
+//TODO Ajouter code devant chaque sortie d'erreur pour grep
 
 void process(struct sequence *sequence, struct position_info *info, struct map *map, char buffer[BUFSIZE])
 {
@@ -64,13 +61,16 @@ void process(struct sequence *sequence, struct position_info *info, struct map *
   if (info->coord->x + info->E > 9){info->E = -1;}
   if (info->coord->y + info->S > 9){info->S = -1;}
   if (info->coord->x - info->W < 0){info->W = -1;}
+  if (!map_shootable(map, info->coord->x, info->coord->y - info->N)){info->N = -1;}
+  if (!map_shootable(map, info->coord->x, info->coord->y + info->S)){info->S = -1;}
+  if (!map_shootable(map, info->coord->x - info->E, info->coord->y)){info->E = -1;}
+  if (!map_shootable(map, info->coord->x + info->W, info->coord->y)){info->W = -1;}
   if (info->N == -1 && info->S == -1 && info->E == -1 && info->W == -1)
   {
     position_info_init(info);
     fprintf(stderr, "Fin de procédure de destruction\n");
   }
-//TODO Gérer positions bateaux détruits
-//TODO Gérer positions mines
+//TODO Véfifier efficacité map_shootable
 
   if (info->coord->x == -1 && info->coord->y == -1)
   {
@@ -85,8 +85,7 @@ void process(struct sequence *sequence, struct position_info *info, struct map *
         fprintf(stderr, "%s", buffer);
         if (strcmp(buffer, "MISS\n"))
         {
-          info->coord->x = sequence->current->target->x;
-          info->coord->y = sequence->current->target->y;
+          coord_set(info->coord, sequence->current->target->x, sequence->current->target->y);
           info->center_shot = true;
           fprintf(stderr, "Démarrage de la procédure de destruction\n");
         }
@@ -108,8 +107,7 @@ void process(struct sequence *sequence, struct position_info *info, struct map *
         {
           fgets(buffer, BUFSIZE, stdin);
           fprintf(stderr, "%s", buffer);
-          info->coord->x = (int) buffer[0] - 'A';
-          info->coord->y = (int) buffer[1] - '0';
+          coord_set(info->coord, (int) buffer[0] - 'A', (int) buffer[1] - '0');
           info->center_shot = false;
           fprintf(stderr, "Démarrage de la procédure de destruction\n");
         }
@@ -133,6 +131,8 @@ void process(struct sequence *sequence, struct position_info *info, struct map *
   }
   else
   {
+    if (info->N + info->S + info->W + info->E == -4){fprintf(stderr, "=======\n" );}
+
     fprintf(stderr, "%d %d %d %d\n",info->N, info->S, info->E, info->W);
     if (!info->center_shot)
     {
@@ -142,6 +142,7 @@ void process(struct sequence *sequence, struct position_info *info, struct map *
       fgets(buffer, BUFSIZE, stdin);
       fprintf(stderr, "%s", buffer);
     }
+
     else if (info->N > -1)
     {
       printf("SHOOT\n");

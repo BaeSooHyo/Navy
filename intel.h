@@ -8,9 +8,11 @@
 #include <stdbool.h>
 
 #define MAPSIZE 10
-#define MINE 50
 #define BUFSIZE 256
 
+#define VIDE 0
+#define MINE 1
+#define DESTROYED 2
 
 struct coord
 {
@@ -35,11 +37,12 @@ struct position_info
 };
 
 void map_create(struct map *self);
-void set_mine(struct map *self, int x, int y);
-void set_coord(struct coord *self, int x, int y);
-void set_mine(struct map *self, int x, int y);
+void coord_set(struct coord *self, int x, int y);
 void position_info_create(struct position_info *self);
 void position_info_init(struct position_info *self);
+bool map_shootable(struct map *self, int x, int y);
+void map_set_destroyed(struct map *self, int x, int y);
+void map_set_mine(struct map *self, int x, int y);
 
 
 #endif
