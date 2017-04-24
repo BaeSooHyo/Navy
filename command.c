@@ -7,6 +7,25 @@ void sequence_create(struct sequence *self)
   self->first = self->current = NULL;
 };
 
+void sequence_destroy(struct sequence *self)
+{
+  if (self->first == NULL)
+  {
+    self->current =  NULL;
+    return;
+  }
+  struct sequence_node *tmp = self->first;
+  self->first = self->first->next;
+  sequence_node_destroy(tmp);
+  free(tmp);
+  sequence_destroy(self);
+}
+
+void sequence_node_destroy(struct sequence_node *self)
+{
+  free(self->target);
+}
+
 void sequence_add_back(struct sequence *self, enum action action, int x, int y)
 {
   struct sequence_node *curr = self->first;
