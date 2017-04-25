@@ -22,9 +22,8 @@ y : 0-9
 
 //TODO Gérer signal SIGINT
 //TODO Assert malloc null
-//TODO fonctions destroy (sequence, sequence_node, map, position_info)
-
-void terminator(int sig);
+//TODO Placement furtif bateaux
+//TODO Changer l'ordre de recherche cardinale en fonction du déplacement du radar
 
 int main(int argc, char const *argv[])
 {
@@ -35,17 +34,12 @@ int main(int argc, char const *argv[])
   map_create(&ennemy_navy);
 
   // mines
-  // set_mine(&ennemy_navy, 0, 9);
-  // set_mine(&ennemy_navy, 2, 9);
-  // set_mine(&ennemy_navy, 4, 9);
-  // set_mine(&ennemy_navy, 6, 9);
-  // set_mine(&ennemy_navy, 8, 9);
+  set_mine(&ennemy_navy, 1, 0); //B0
+  set_mine(&ennemy_navy, 9, 1); //J1
+  set_mine(&ennemy_navy, 8, 9); //I9
+  set_mine(&ennemy_navy, 0, 8); //A8
+  set_mine(&ennemy_navy, 4, 6); //D6
 
-  set_mine(&ennemy_navy, 3, 3);
-  set_mine(&ennemy_navy, 4, 4);
-  set_mine(&ennemy_navy, 5, 5);
-  set_mine(&ennemy_navy, 6, 6);
-  set_mine(&ennemy_navy, 6, 4);
 
   printf("H0H4\n");
   fgets(buffer, BUFSIZE, stdin);
@@ -62,26 +56,25 @@ int main(int argc, char const *argv[])
   struct sequence attack;
   sequence_create(&attack);
 
-  sequence_add_back(&attack, SHOOT, 5, 3);  //F3
+  sequence_add_back(&attack, POLL,  4, 4);  //E4
+  sequence_add_back(&attack, POLL,  4, 1);  //E1
+  sequence_add_back(&attack, SHOOT,  6, 4);  //G4
+  sequence_add_back(&attack, POLL,  7, 1);  //H1
   sequence_add_back(&attack, POLL,  8, 4);  //I4
+  sequence_add_back(&attack, POLL,  5, 5);  //F5
   sequence_add_back(&attack, POLL,  8, 7);  //I7
-  sequence_add_back(&attack, SHOOT, 8, 9);  //I9
   sequence_add_back(&attack, POLL,  5, 8);  //F8
   sequence_add_back(&attack, POLL,  2, 8);  //C8
-  sequence_add_back(&attack, SHOOT, 4, 6);  //E6
-  sequence_add_back(&attack, SHOOT, 3, 5);  //D5
-  sequence_add_back(&attack, SHOOT, 0, 8);  //A8
-  sequence_add_back(&attack, POLL,  2, 5);  //B5
-  sequence_add_back(&attack, POLL,  2, 2);  //B2
-  sequence_add_back(&attack, SHOOT, 1, 0);  //B0
-  sequence_add_back(&attack, POLL,  4, 1);  //D1
-  sequence_add_back(&attack, POLL,  7, 1);  //D1
-  sequence_add_back(&attack, SHOOT, 9, 1);  //D1
+  sequence_add_back(&attack, POLL,  1, 5);  //B5
+  sequence_add_back(&attack, POLL,  1, 2);  //B2
+  sequence_add_back(&attack, SHOOT,  2, 0);  //C0
+  sequence_add_back(&attack, SHOOT,  9, 2);  //J2
+  sequence_add_back(&attack, SHOOT,  7, 9);  //H9
+  sequence_add_back(&attack, SHOOT,  0, 7);  //A7
 
 
-  struct position_info info;
-  position_info_create(&info);
-
+  struct info info;
+  info_create(&info);
 
   while(strcmp(buffer, "START\n"))
   {

@@ -25,7 +25,7 @@ struct map
   int map[MAPSIZE][MAPSIZE];
 };
 
-struct position_info
+struct info
 {
   struct coord *coord;
   int N;
@@ -38,8 +38,9 @@ struct position_info
 
 void map_create(struct map *self);
 void coord_set(struct coord *self, int x, int y);
-void position_info_create(struct position_info *self);
-void position_info_init(struct position_info *self);
+void info_create(struct info *self);
+void info_destroy(struct info *self);
+void info_init(struct info *self);
 bool map_shootable(struct map *self, int x, int y);
 void map_set_destroyed(struct map *self, int x, int y);
 void map_set_mine(struct map *self, int x, int y);
