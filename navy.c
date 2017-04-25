@@ -21,8 +21,8 @@ y : 0-9
 */
 
 //TODO Gérer signal SIGINT
-//TODO Placement furtif bateaux
-//TODO Changer l'ordre de recherche cardinale en fonction du déplacement du radar
+//TODO Placement furtif bateaux   bord | 2 | 5
+//IDEA Changer l'ordre de recherche cardinale en fonction du déplacement du radar
 
 int main(int argc, char const *argv[])
 {
@@ -39,7 +39,7 @@ int main(int argc, char const *argv[])
   set_mine(&ennemy_navy, 0, 8); //A8
   set_mine(&ennemy_navy, 4, 6); //D6
 
-
+  // bataux
   printf("H0H4\n");
   fgets(buffer, BUFSIZE, stdin);
   printf("C5F5\n");
@@ -51,26 +51,25 @@ int main(int argc, char const *argv[])
   printf("I2I3\n");
   fgets(buffer, BUFSIZE, stdin);
 
-  //plan d'attaque
+  // plan d'attaque
   struct sequence attack;
   sequence_create(&attack);
 
-  sequence_add_back(&attack, POLL,  4, 4);  //E4
-  sequence_add_back(&attack, POLL,  4, 1);  //E1
-  sequence_add_back(&attack, SHOOT,  6, 4);  //G4
-  sequence_add_back(&attack, POLL,  7, 1);  //H1
-  sequence_add_back(&attack, POLL,  8, 4);  //I4
-  sequence_add_back(&attack, POLL,  5, 5);  //F5
-  sequence_add_back(&attack, POLL,  8, 7);  //I7
-  sequence_add_back(&attack, POLL,  5, 8);  //F8
-  sequence_add_back(&attack, POLL,  2, 8);  //C8
-  sequence_add_back(&attack, POLL,  1, 5);  //B5
-  sequence_add_back(&attack, POLL,  1, 2);  //B2
-  sequence_add_back(&attack, SHOOT,  2, 0);  //C0
-  sequence_add_back(&attack, SHOOT,  9, 2);  //J2
-  sequence_add_back(&attack, SHOOT,  7, 9);  //H9
-  sequence_add_back(&attack, SHOOT,  0, 7);  //A7
-
+  sequence_add_back(&attack, POLL,    4,   4);  //E4
+  sequence_add_back(&attack, POLL,    4,   1);  //E1
+  sequence_add_back(&attack, SHOOT,   6,   4);  //G4
+  sequence_add_back(&attack, POLL,    7,   1);  //H1
+  sequence_add_back(&attack, POLL,    8,   4);  //I4
+  sequence_add_back(&attack, POLL,    5,   5);  //F5
+  sequence_add_back(&attack, POLL,    8,   7);  //I7
+  sequence_add_back(&attack, POLL,    5,   8);  //F8
+  sequence_add_back(&attack, POLL,    2,   8);  //C8
+  sequence_add_back(&attack, POLL,    1,   5);  //B5
+  sequence_add_back(&attack, POLL,    1,   2);  //B2
+  sequence_add_back(&attack, SHOOT,   2,   0);  //C0
+  sequence_add_back(&attack, SHOOT,   9,   2);  //J2
+  sequence_add_back(&attack, SHOOT,   7,   9);  //H9
+  sequence_add_back(&attack, SHOOT,   0,   7);  //A7
 
   struct info info;
   info_create(&info);
@@ -83,7 +82,7 @@ int main(int argc, char const *argv[])
 
   for (size_t i = 1; ; i++)
   {
-    fprintf(stderr, "\nRound %lu : \n", i);
+    fprintf(stderr, "\n[-- Round %lu --]\n", i);
     process(&attack, &info, &ennemy_navy, buffer);
   }
   return EXIT_SUCCESS;

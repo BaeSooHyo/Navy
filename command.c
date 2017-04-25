@@ -10,6 +10,8 @@ void sequence_create(struct sequence *self)
   self->first = self->current = NULL;
 };
 
+//Détruit récursivement les éléments de la séquence
+//Complexité : O(n)
 void sequence_destroy(struct sequence *self)
 {
   if (self->first == NULL)
@@ -29,6 +31,8 @@ void sequence_node_destroy(struct sequence_node *self)
   free(self->target);
 }
 
+//Crée un nouvel élément à la fin de la séquence
+//Complexité O(n)
 void sequence_add_back(struct sequence *self, enum action action, int x, int y)
 {
   struct sequence_node *curr = self->first;
@@ -100,6 +104,15 @@ void set_mine(struct map *self, int x, int y)
   map_set_mine(self, x, y);
 }
 
+
+
+/*
+* Parcours la séquence pour rechercher des bateaux ennemis (phase de recherche)
+* Pour chaque bateau ennemi repéré (par sonde ou par tir), parcours les cases voisines
+* pour le détruire (phase de destruction)
+* La séquence de recherche est supposée repérer l'ensemble des bateaux en une seule itération
+* dans le cas où ceux ci ne bougent pas
+*/
 void process(struct sequence *sequence, struct info *info, struct map *map, char buffer[BUFSIZE])
 {
   if (sequence->current == NULL){sequence->current = sequence->first; fprintf(stderr, "Nouvelle itération de la séquence\n");}
@@ -122,12 +135,18 @@ void process(struct sequence *sequence, struct info *info, struct map *map, char
   if (info->N + info->S + info->W + info->E == -4 && info->coord->x != -1)
   {
     info_init(info);
-    fprintf(stderr, "Fin de procédure de destruction\n");
   }
+
+
+
   if (info->coord->x == -1 && info->coord->y == -1)
   {
+    /*
+    PHASE DE RECHERCHE
+    */
     switch (sequence->current->action)
     {
+      //TODO Dans le cas où !map_shootable -> next (while)
       case SHOOT:
       {
         send_action(SHOOT);
@@ -139,7 +158,6 @@ void process(struct sequence *sequence, struct info *info, struct map *map, char
           coord_set(info->coord, sequence->current->target->x, sequence->current->target->y);
           info->center_shot = true;
           map_set_destroyed(map, info->coord->x, info->coord->y);
-          fprintf(stderr, "Démarrage de la procédure de destruction\n");
         }
         sequence->current = sequence->current->next;
       }
@@ -158,7 +176,6 @@ void process(struct sequence *sequence, struct info *info, struct map *map, char
           info_init(info);
           coord_set(info->coord, (int) buffer[0] - 'A', (int) buffer[1] - '0');
           info->center_shot = false;
-          fprintf(stderr, "Démarrage de la procédure de destruction\n");
         }
         else
         {
@@ -179,7 +196,10 @@ void process(struct sequence *sequence, struct info *info, struct map *map, char
   }
   else
   {
-    // fprintf(stderr, "%d %d %d %d\n",info->N, info->S, info->E, info->W);
+
+    /*
+    PHASE DE DESTRUCTION
+    */
     if (!info->center_shot)
     {
       send_action(SHOOT);
