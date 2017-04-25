@@ -21,7 +21,6 @@ y : 0-9
 */
 
 //TODO Gérer signal SIGINT
-//TODO Assert malloc null
 //TODO Placement furtif bateaux
 //TODO Changer l'ordre de recherche cardinale en fonction du déplacement du radar
 

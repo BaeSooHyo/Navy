@@ -3,9 +3,6 @@
 
 #include "command.h"
 #include "intel.h"
-#include <stdio.h>
-#include <stdlib.h>
-
 
 enum action
 {

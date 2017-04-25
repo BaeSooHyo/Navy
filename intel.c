@@ -1,10 +1,15 @@
 #include "intel.h"
 #include "command.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
+
 void map_create(struct map *self)
 {
   for (size_t i = 0; i < MAPSIZE; i++)
-  {for (size_t j = 0; j < MAPSIZE; j++)
+  {
+    for (size_t j = 0; j < MAPSIZE; j++)
     {
       self->map[i][j] = 0;
     }
@@ -20,6 +25,7 @@ void coord_set(struct coord *self, int x, int y)
 void info_create(struct info *self)
 {
   self->coord = malloc(sizeof(struct coord));
+  assert(self->coord != NULL);
   info_init(self);
 }
 

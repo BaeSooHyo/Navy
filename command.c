@@ -1,5 +1,8 @@
 #include "command.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
 #include <string.h>
 
 void sequence_create(struct sequence *self)
@@ -30,7 +33,9 @@ void sequence_add_back(struct sequence *self, enum action action, int x, int y)
 {
   struct sequence_node *curr = self->first;
   struct sequence_node *new = malloc(sizeof (struct sequence_node));
+  assert(new != NULL);
   new->target = malloc(sizeof(struct coord));
+  assert(new->target != NULL);
   coord_set(new->target, x, y);
   new->action = action;
   new->next = NULL;
@@ -119,8 +124,6 @@ void process(struct sequence *sequence, struct info *info, struct map *map, char
     info_init(info);
     fprintf(stderr, "Fin de procédure de destruction\n");
   }
-//TODO Véfifier efficacité map_shootable
-
   if (info->coord->x == -1 && info->coord->y == -1)
   {
     switch (sequence->current->action)

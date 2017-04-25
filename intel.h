@@ -3,8 +3,6 @@
 
 #include "intel.h"
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <stdbool.h>
 
 #define MAPSIZE 10
