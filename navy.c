@@ -71,6 +71,20 @@ int main(int argc, char const *argv[])
   sequence_add_back(&attack, SHOOT,   7,   9);  //H9
   sequence_add_back(&attack, SHOOT,   0,   7);  //A7
 
+  sequence_add_back(&attack, SHOOT,   0,   0);  //A0
+  sequence_add_back(&attack, SHOOT,   2,   0);  //A0
+
+  sequence_add_back(&attack, SHOOT,   9,   0);  //J0
+  sequence_add_back(&attack, SHOOT,   9,   2);  //J2
+
+  sequence_add_back(&attack, SHOOT,   9,   2);  //J9
+  sequence_add_back(&attack, SHOOT,   9,   2);  //H9
+
+  sequence_add_back(&attack, SHOOT,   9,   2);  //A9
+  sequence_add_back(&attack, SHOOT,   9,   2);  //A7
+
+  //TODO Ajouter l'ensemble des cases vides (à côté des mines)
+
   struct info info;
   info_create(&info);
 

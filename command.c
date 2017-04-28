@@ -57,6 +57,16 @@ void sequence_add_back(struct sequence *self, enum action action, int x, int y)
   curr->next = new;
 }
 
+void sequence_next(struct sequence *self)
+{
+  self->current = self->current->next;
+  if (self->current == NULL)
+  {
+    self->current = self->first;
+    fprintf(stderr, "Répétition de la séquence\n");
+  }
+}
+
 void send_action(enum action action)
 {
   switch (action) {
@@ -104,8 +114,6 @@ void set_mine(struct map *self, int x, int y)
   map_set_mine(self, x, y);
 }
 
-
-
 /*
 * Parcours la séquence pour rechercher des bateaux ennemis (phase de recherche)
 * Pour chaque bateau ennemi repéré (par sonde ou par tir), parcours les cases voisines
@@ -115,9 +123,6 @@ void set_mine(struct map *self, int x, int y)
 */
 void process(struct sequence *sequence, struct info *info, struct map *map, char buffer[BUFSIZE])
 {
-  if (sequence->current == NULL){sequence->current = sequence->first; fprintf(stderr, "Nouvelle itération de la séquence\n");}
-  //Dans le cas où l'adversaire ne bouge pas ses bateaux, la séquence ne sera jamais répétée
-
   if (info->coord->y - info->N < 0){info->N = -1;}
   if (!map_shootable(map, info->coord->x, info->coord->y - info->N)){info->N = -1;}
 
@@ -146,7 +151,12 @@ void process(struct sequence *sequence, struct info *info, struct map *map, char
     */
     switch (sequence->current->action)
     {
-      //TODO Dans le cas où !map_shootable -> next (while)
+      if (!map_shootable(map, sequence->current->target->x, sequence->current->target->y))
+      {
+        sequence_next(sequence);
+        process(sequence, info, map, buffer);
+      }
+
       case SHOOT:
       {
         send_action(SHOOT);
@@ -159,7 +169,8 @@ void process(struct sequence *sequence, struct info *info, struct map *map, char
           info->center_shot = true;
           map_set_destroyed(map, info->coord->x, info->coord->y);
         }
-        sequence->current = sequence->current->next;
+        sequence_next(sequence);
+
       }
       break;
 
@@ -179,7 +190,8 @@ void process(struct sequence *sequence, struct info *info, struct map *map, char
         }
         else
         {
-          sequence->current = sequence->current->next;
+          sequence_next(sequence);
+
         }
       }
       break;
@@ -188,7 +200,8 @@ void process(struct sequence *sequence, struct info *info, struct map *map, char
       {
         send_action(MOVE);
         send_coord(sequence->current->target);
-        sequence->current = sequence->current->next;
+        sequence_next(sequence);
+
       }
       break;
     }
