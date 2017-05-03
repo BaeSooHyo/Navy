@@ -1,7 +1,7 @@
 CC = gcc
 CDFLAGS = -Wall -g -std=c99
 LDFLAGS = -g
-TARGETS = navy
+TARGETS = ivanGetTheKatyusha
 
 all : $(TARGETS)
 

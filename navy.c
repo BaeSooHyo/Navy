@@ -9,7 +9,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <signal.h>
-
+#include <time.h>
 
 /*
 Grille 10x10
@@ -20,7 +20,7 @@ y : 0-9
 3 actions : SHOOT POLL MOVE
 */
 
-//TODO Gérer signal SIGINT
+//TODO Gérer fin programme
 //TODO Placement furtif bateaux   bord | 2 | 5
 //IDEA Changer l'ordre de recherche cardinale en fonction du déplacement du radar
 
@@ -40,16 +40,52 @@ int main(int argc, char const *argv[])
   set_mine(&ennemy_navy, 4, 6); //D6
 
   // bataux
-  printf("H0H4\n");
-  fgets(buffer, BUFSIZE, stdin);
-  printf("C5F5\n");
-  fgets(buffer, BUFSIZE, stdin);
-  printf("E6E8\n");
-  fgets(buffer, BUFSIZE, stdin);
-  printf("C6C8\n");
-  fgets(buffer, BUFSIZE, stdin);
-  printf("I2I3\n");
-  fgets(buffer, BUFSIZE, stdin);
+
+  srand(time(NULL));
+  int hasard = rand();
+  fprintf(stderr, "%d\n", hasard);
+  if(hasard % 6 == 0 || hasard %6 == 5)
+  {
+    printf("C0C4\n");
+    fgets(buffer, BUFSIZE, stdin);
+    printf("H5E5\n");
+    fgets(buffer, BUFSIZE, stdin);
+    printf("F6F8\n");
+    fgets(buffer, BUFSIZE, stdin);
+    printf("H6H8\n");
+    fgets(buffer, BUFSIZE, stdin);
+    printf("B2B3\n");
+    fgets(buffer, BUFSIZE, stdin);
+    fprintf(stderr, "Disposition n°1\n");
+  }
+  else if (hasard % 6 == 1 || hasard % 6 == 4 )
+  {
+    printf("H9H5\n");
+    fgets(buffer, BUFSIZE, stdin);
+    printf("C4F4\n");
+    fgets(buffer, BUFSIZE, stdin);
+    printf("E3E1\n");
+    fgets(buffer, BUFSIZE, stdin);
+    printf("C3C1\n");
+    fgets(buffer, BUFSIZE, stdin);
+    printf("I7I6\n");
+    fgets(buffer, BUFSIZE, stdin);
+    fprintf(stderr, "Disposition n°2\n");
+  }
+  else  // %2 ou %3 == 0
+  {
+    printf("H0H4\n");
+    fgets(buffer, BUFSIZE, stdin);
+    printf("C5F5\n");
+    fgets(buffer, BUFSIZE, stdin);
+    printf("E6E8\n");
+    fgets(buffer, BUFSIZE, stdin);
+    printf("C6C8\n");
+    fgets(buffer, BUFSIZE, stdin);
+    printf("I2I3\n");
+    fgets(buffer, BUFSIZE, stdin);
+    fprintf(stderr, "Disposition n°3\n");
+  }
 
   // plan d'attaque
   struct sequence attack;
@@ -66,13 +102,9 @@ int main(int argc, char const *argv[])
   sequence_add_back(&attack, POLL,    2,   8);  //C8
   sequence_add_back(&attack, POLL,    1,   5);  //B5
   sequence_add_back(&attack, POLL,    1,   2);  //B2
-  sequence_add_back(&attack, SHOOT,   2,   0);  //C0
-  sequence_add_back(&attack, SHOOT,   9,   2);  //J2
-  sequence_add_back(&attack, SHOOT,   7,   9);  //H9
-  sequence_add_back(&attack, SHOOT,   0,   7);  //A7
 
   sequence_add_back(&attack, SHOOT,   0,   0);  //A0
-  sequence_add_back(&attack, SHOOT,   2,   0);  //A0
+  sequence_add_back(&attack, SHOOT,   2,   0);  //C0
 
   sequence_add_back(&attack, SHOOT,   9,   0);  //J0
   sequence_add_back(&attack, SHOOT,   9,   2);  //J2
@@ -82,8 +114,6 @@ int main(int argc, char const *argv[])
 
   sequence_add_back(&attack, SHOOT,   9,   2);  //A9
   sequence_add_back(&attack, SHOOT,   9,   2);  //A7
-
-  //TODO Ajouter l'ensemble des cases vides (à côté des mines)
 
   struct info info;
   info_create(&info);
