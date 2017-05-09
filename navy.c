@@ -20,10 +20,6 @@ y : 0-9
 3 actions : SHOOT POLL MOVE
 */
 
-//TODO Gérer fin programme
-//TODO Placement furtif bateaux   bord | 2 | 5
-//IDEA Changer l'ordre de recherche cardinale en fonction du déplacement du radar
-
 int main(int argc, char const *argv[])
 {
   setbuf(stdout, NULL);
