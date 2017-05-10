@@ -36,11 +36,10 @@ int main(int argc, char const *argv[])
   set_mine(&ennemy_navy, 4, 6); //D6
 
   // bataux
-
   srand(time(NULL));
   int hasard = rand();
   fprintf(stderr, "%d\n", hasard);
-  if(hasard % 6 == 0 || hasard %6 == 5)
+  if(hasard % 3 == 0)
   {
     printf("C0C4\n");
     fgets(buffer, BUFSIZE, stdin);
@@ -54,7 +53,7 @@ int main(int argc, char const *argv[])
     fgets(buffer, BUFSIZE, stdin);
     fprintf(stderr, "Disposition n°1\n");
   }
-  else if (hasard % 6 == 1 || hasard % 6 == 4 )
+  else if (hasard % 3 == 1)
   {
     printf("H9H5\n");
     fgets(buffer, BUFSIZE, stdin);
@@ -68,7 +67,7 @@ int main(int argc, char const *argv[])
     fgets(buffer, BUFSIZE, stdin);
     fprintf(stderr, "Disposition n°2\n");
   }
-  else  // %2 ou %3 == 0
+  else
   {
     printf("H0H4\n");
     fgets(buffer, BUFSIZE, stdin);

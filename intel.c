@@ -18,17 +18,24 @@ void map_create(struct map *self)
   }
 }
 
+//Setter simple
 void coord_set(struct coord *self, int x, int y)
 {
   self->x = x;
   self->y = y;
 }
 
+//Initialise la structure info self
 void info_create(struct info *self)
 {
   info_init(self);
 }
 
+/*Initialise les valeurs de la structure info self
+*Place à 1 chacune des 4 directions
+*Réinitialise les coordonnées à (-1;-1) (absence d'information)
+*Place à false center_shot
+*/
 void info_init(struct info *self)
 {
   self->N = self->E = self->W = self->S = 1;

@@ -34,6 +34,8 @@ void sequence_add_back(struct sequence *self, enum action action, int x, int y)
   curr->next = new;
 }
 
+
+//Avance l'élément courant d'un noeud
 void sequence_next(struct sequence *self)
 {
   self->current = self->current->next;
@@ -44,6 +46,7 @@ void sequence_next(struct sequence *self)
   }
 }
 
+//Formate et envoie l'action sur la sortie standard et la sortie d'erreur standard
 void send_action(enum action action)
 {
   switch (action) {
@@ -68,6 +71,7 @@ void send_action(enum action action)
   }
 }
 
+//Formate et envoie les coordonnées passées en paramètres sur la sortie standard et la sortie d'erreur standard
 void send_coord_explicit(int x, int y)
 {
   char abscisse = 'A' + x;
@@ -75,16 +79,19 @@ void send_coord_explicit(int x, int y)
   fprintf(stderr, "%c%d\n", abscisse, y);
 }
 
+//Envoie explicitement les coordonnées de self à send_coord_explicit
 void send_coord(struct coord *self)
 {
   send_coord_explicit(self->x, self->y);
 }
 
+//Envoie explicitement les coordonnées de self à send_coord_explicit, décalées de x,y
 void send_coord_relative(struct coord *self, int x, int y)
 {
   send_coord_explicit(self->x + x, self->y + y);
 }
 
+//Envoie les coordonnées de la mine sur la sortie standard et place la mine dans la map self
 void set_mine(struct map *self, int x, int y)
 {
   send_coord_explicit(x,y);
