@@ -99,8 +99,6 @@ int main(int argc, char const *argv[])
   sequence_add_back(&attack, POLL,    1,   2);  //B2
 
   sequence_add_back(&attack, SHOOT,   6,   4);  //G4
-  sequence_add_back(&attack, SHOOT,   3,   6);  //D6
-
 
   sequence_add_back(&attack, POLL,    1,   1);  //B1
   sequence_add_back(&attack, POLL,    8,   1);  //I1
