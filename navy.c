@@ -89,7 +89,6 @@ int main(int argc, char const *argv[])
 
   sequence_add_back(&attack, POLL,    4,   4);  //E4
   sequence_add_back(&attack, POLL,    4,   1);  //E1
-  sequence_add_back(&attack, SHOOT,   6,   4);  //G4
   sequence_add_back(&attack, POLL,    7,   1);  //H1
   sequence_add_back(&attack, POLL,    8,   4);  //I4
   sequence_add_back(&attack, POLL,    5,   5);  //F5
@@ -98,6 +97,10 @@ int main(int argc, char const *argv[])
   sequence_add_back(&attack, POLL,    2,   8);  //C8
   sequence_add_back(&attack, POLL,    1,   5);  //B5
   sequence_add_back(&attack, POLL,    1,   2);  //B2
+
+  sequence_add_back(&attack, SHOOT,   6,   4);  //G4
+  sequence_add_back(&attack, SHOOT,   3,   6);  //D6
+
 
   sequence_add_back(&attack, POLL,    1,   1);  //B1
   sequence_add_back(&attack, POLL,    8,   1);  //I1
