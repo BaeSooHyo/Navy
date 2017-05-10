@@ -14,10 +14,11 @@ enum action
 struct sequence_node
 {
   enum action action;
-  struct coord *target;
+  struct coord target;
   struct sequence_node *next;
 };
 
+//Linked list
 struct sequence
 {
   struct sequence_node *first;
@@ -25,8 +26,6 @@ struct sequence
 };
 
 void sequence_create(struct sequence *self);
-void sequence_destroy(struct sequence *self);
-void sequence_node_destroy(struct sequence_node *self);
 void sequence_add_back(struct sequence *self, enum action action, int x, int y);
 void send_action(enum action action);
 void send_coord_explicit(int x, int y);

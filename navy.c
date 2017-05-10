@@ -99,17 +99,18 @@ int main(int argc, char const *argv[])
   sequence_add_back(&attack, POLL,    1,   5);  //B5
   sequence_add_back(&attack, POLL,    1,   2);  //B2
 
+
   sequence_add_back(&attack, SHOOT,   0,   0);  //A0
   sequence_add_back(&attack, SHOOT,   2,   0);  //C0
 
   sequence_add_back(&attack, SHOOT,   9,   0);  //J0
   sequence_add_back(&attack, SHOOT,   9,   2);  //J2
 
-  sequence_add_back(&attack, SHOOT,   9,   2);  //J9
-  sequence_add_back(&attack, SHOOT,   9,   2);  //H9
+  sequence_add_back(&attack, SHOOT,   9,   9);  //J9
+  sequence_add_back(&attack, SHOOT,   7,   2);  //H9
 
-  sequence_add_back(&attack, SHOOT,   9,   2);  //A9
-  sequence_add_back(&attack, SHOOT,   9,   2);  //A7
+  sequence_add_back(&attack, SHOOT,   0,   9);  //A9
+  sequence_add_back(&attack, SHOOT,   0,   7);  //A7
 
   struct info info;
   info_create(&info);

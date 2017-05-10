@@ -10,27 +10,6 @@ void sequence_create(struct sequence *self)
   self->first = self->current = NULL;
 };
 
-//Détruit récursivement les éléments de la séquence
-//Complexité : O(n)
-void sequence_destroy(struct sequence *self)
-{
-  if (self->first == NULL)
-  {
-    self->current =  NULL;
-    return;
-  }
-  struct sequence_node *tmp = self->first;
-  self->first = self->first->next;
-  sequence_node_destroy(tmp);
-  free(tmp);
-  sequence_destroy(self);
-}
-
-void sequence_node_destroy(struct sequence_node *self)
-{
-  free(self->target);
-}
-
 //Crée un nouvel élément à la fin de la séquence
 //Complexité O(n)
 void sequence_add_back(struct sequence *self, enum action action, int x, int y)
@@ -38,9 +17,7 @@ void sequence_add_back(struct sequence *self, enum action action, int x, int y)
   struct sequence_node *curr = self->first;
   struct sequence_node *new = malloc(sizeof (struct sequence_node));
   assert(new != NULL);
-  new->target = malloc(sizeof(struct coord));
-  assert(new->target != NULL);
-  coord_set(new->target, x, y);
+  coord_set(&(new->target), x, y);
   new->action = action;
   new->next = NULL;
 
@@ -123,35 +100,35 @@ void set_mine(struct map *self, int x, int y)
 */
 void process(struct sequence *sequence, struct info *info, struct map *map, char buffer[BUFSIZE])
 {
-  if (info->coord->y - info->N < 0){info->N = -1;}
-  if (!map_shootable(map, info->coord->x, info->coord->y - info->N)){info->N = -1;}
+  if (info->coord.y - info->N < 0){info->N = -1;}
+  if (!map_shootable(map, info->coord.x, info->coord.y - info->N)){info->N = -1;}
 
-  if (info->coord->x + info->E > 9){info->E = -1;}
-  if (!map_shootable(map, info->coord->x + info->E, info->coord->y)){info->E = -1;}
+  if (info->coord.x + info->E > 9){info->E = -1;}
+  if (!map_shootable(map, info->coord.x + info->E, info->coord.y)){info->E = -1;}
 
-  if (info->coord->y + info->S > 9){info->S = -1;}
-  if (!map_shootable(map, info->coord->x, info->coord->y + info->S)){info->S = -1;}
+  if (info->coord.y + info->S > 9){info->S = -1;}
+  if (!map_shootable(map, info->coord.x, info->coord.y + info->S)){info->S = -1;}
 
-  if (info->coord->x - info->W < 0){info->W = -1;}
-  if (!map_shootable(map, info->coord->x - info->W, info->coord->y)){info->W = -1;}
+  if (info->coord.x - info->W < 0){info->W = -1;}
+  if (!map_shootable(map, info->coord.x - info->W, info->coord.y)){info->W = -1;}
 
 
 
-  if (info->N + info->S + info->W + info->E == -4 && info->coord->x != -1)
+  if (info->N + info->S + info->W + info->E == -4 && info->coord.x != -1)
   {
     info_init(info);
   }
 
 
 
-  if (info->coord->x == -1 && info->coord->y == -1)
+  if (info->coord.x == -1 && info->coord.y == -1)
   {
     /*
     PHASE DE RECHERCHE
     */
     switch (sequence->current->action)
     {
-      if (!map_shootable(map, sequence->current->target->x, sequence->current->target->y))
+      if (!map_shootable(map, sequence->current->target.x, sequence->current->target.y))
       {
         sequence_next(sequence);
         process(sequence, info, map, buffer);
@@ -160,14 +137,14 @@ void process(struct sequence *sequence, struct info *info, struct map *map, char
       case SHOOT:
       {
         send_action(SHOOT);
-        send_coord(sequence->current->target);
+        send_coord(&(sequence->current->target));
         fgets(buffer, BUFSIZE, stdin);
         fprintf(stderr, "%s", buffer);
         if (strcmp(buffer, "MISS\n"))
         {
-          coord_set(info->coord, sequence->current->target->x, sequence->current->target->y);
+          coord_set(&(info->coord), sequence->current->target.x, sequence->current->target.y);
           info->center_shot = true;
-          map_set_destroyed(map, info->coord->x, info->coord->y);
+          map_set_destroyed(map, info->coord.x, info->coord.y);
         }
         sequence_next(sequence);
 
@@ -177,7 +154,7 @@ void process(struct sequence *sequence, struct info *info, struct map *map, char
       case POLL:
       {
         send_action(POLL);
-        send_coord(sequence->current->target);
+        send_coord(&(sequence->current->target));
         fgets(buffer, BUFSIZE, stdin);
         fprintf(stderr, "%s", buffer);
         if (strcmp(buffer ,"EMPTY\n"))
@@ -185,7 +162,7 @@ void process(struct sequence *sequence, struct info *info, struct map *map, char
           fgets(buffer, BUFSIZE, stdin);
           fprintf(stderr, "%s", buffer);
           info_init(info);
-          coord_set(info->coord, (int) buffer[0] - 'A', (int) buffer[1] - '0');
+          coord_set(&(info->coord), (int) buffer[0] - 'A', (int) buffer[1] - '0');
           info->center_shot = false;
         }
         else
@@ -199,7 +176,7 @@ void process(struct sequence *sequence, struct info *info, struct map *map, char
       case MOVE :
       {
         send_action(MOVE);
-        send_coord(sequence->current->target);
+        send_coord(&(sequence->current->target));
         sequence_next(sequence);
 
       }
@@ -216,25 +193,25 @@ void process(struct sequence *sequence, struct info *info, struct map *map, char
     if (!info->center_shot)
     {
       send_action(SHOOT);
-      send_coord(info->coord);
+      send_coord(&(info->coord));
       info->center_shot = true;
       fgets(buffer, BUFSIZE, stdin);
       fprintf(stderr, "%s", buffer);
       if (!strcmp(buffer, "HIT\n"))
       {
-        map_set_destroyed(map, info->coord->x, info->coord->y);
+        map_set_destroyed(map, info->coord.x, info->coord.y);
       }
     }
 
     else if (info->N > -1)
     {
       send_action(SHOOT);
-      send_coord_relative(info->coord, 0, -info->N);
+      send_coord_relative(&(info->coord), 0, -info->N);
       fgets(buffer, BUFSIZE, stdin);
       fprintf(stderr, "%s", buffer);
       if (!strcmp(buffer, "HIT\n"))
       {
-        map_set_destroyed(map, info->coord->x, info->coord->y - info->N);
+        map_set_destroyed(map, info->coord.x, info->coord.y - info->N);
         info->N++;
         info->W = info->E = -1;
       }
@@ -246,12 +223,12 @@ void process(struct sequence *sequence, struct info *info, struct map *map, char
     else if (info->E > -1)
     {
       send_action(SHOOT);
-      send_coord_relative(info->coord, +info->E, 0);
+      send_coord_relative(&(info->coord), +info->E, 0);
       fgets(buffer, BUFSIZE, stdin);
       fprintf(stderr, "%s", buffer);
       if (!strcmp(buffer, "HIT\n"))
       {
-        map_set_destroyed(map, info->coord->x + info->E, info->coord->y);
+        map_set_destroyed(map, info->coord.x + info->E, info->coord.y);
         info->E++;
         info->N = info->S = -1;
       }
@@ -263,12 +240,12 @@ void process(struct sequence *sequence, struct info *info, struct map *map, char
     else if (info->S > -1)
     {
       send_action(SHOOT);
-      send_coord_relative(info->coord, 0, +info->S);
+      send_coord_relative(&(info->coord), 0, +info->S);
       fgets(buffer, BUFSIZE, stdin);
       fprintf(stderr, "%s", buffer);
       if (!strcmp(buffer, "HIT\n"))
       {
-        map_set_destroyed(map, info->coord->x, info->coord->y + info->S);
+        map_set_destroyed(map, info->coord.x, info->coord.y + info->S);
         info->S++;
         info->W = info->E = -1;
       }
@@ -280,12 +257,12 @@ void process(struct sequence *sequence, struct info *info, struct map *map, char
     else if (info->W > -1)
     {
       send_action(SHOOT);
-      send_coord_relative(info->coord, -info->W, 0);
+      send_coord_relative(&(info->coord), -info->W, 0);
       fgets(buffer, BUFSIZE, stdin);
       fprintf(stderr, "%s", buffer);
       if (!strcmp(buffer, "HIT\n"))
       {
-        map_set_destroyed(map, info->coord->x - info->W, info->coord->y);
+        map_set_destroyed(map, info->coord.x - info->W, info->coord.y);
         info->W++;
       }
       else

@@ -26,20 +26,13 @@ void coord_set(struct coord *self, int x, int y)
 
 void info_create(struct info *self)
 {
-  self->coord = malloc(sizeof(struct coord));
-  assert(self->coord != NULL);
   info_init(self);
-}
-
-void info_destroy(struct info *self)
-{
-  free(self->coord);
 }
 
 void info_init(struct info *self)
 {
   self->N = self->E = self->W = self->S = 1;
-  coord_set(self->coord, -1, -1);     //(-1;-1) : absence d'information
+  coord_set(&(self->coord), -1, -1);     //(-1;-1) : absence d'information
   self->center_shot = false;
 }
 
