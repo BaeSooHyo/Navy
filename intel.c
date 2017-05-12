@@ -3,10 +3,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 
-
-//Stocke les informations d'un plan d'eau
+//Initialise les informations d'un plan d'eau
 void map_create(struct map *self)
 {
   for (size_t i = 0; i < MAPSIZE; i++)

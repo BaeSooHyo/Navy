@@ -5,17 +5,25 @@
 #include <assert.h>
 #include <string.h>
 
+//Initialise une séquence
 void sequence_create(struct sequence *self)
 {
   self->first = self->current = NULL;
 };
 
-//Crée un nouvel élément à la fin de la séquence
-//Complexité O(n)
+/*
+*Crée un nouvel élément à la fin de la séquence
+*Complexité O(1), grâce au noeud courant de la structure
+*Un appel de sequence_next() est nécessaire pour replacer l'élément courant au début de la liste
+*Peut éventuellement servir à ajouter un noeud après l'élément courant en cours de jeu
+*/
 void sequence_add_back(struct sequence *self, enum action action, int x, int y)
 {
-  struct sequence_node *curr = self->first;
+  struct sequence_node *curr = self->current;
   struct sequence_node *new = malloc(sizeof (struct sequence_node));
+  //Pas possible d'allouer dans la pile
+  //Pas possible de libérer manuellement la mémoire après la réception du signal SIGKILL
+  //-> Fuite mémoire
   assert(new != NULL);
   coord_set(&(new->target), x, y);
   new->action = action;
@@ -32,6 +40,8 @@ void sequence_add_back(struct sequence *self, enum action action, int x, int y)
     curr = curr->next;
   }
   curr->next = new;
+
+  self->current = new;
 }
 
 
@@ -41,7 +51,7 @@ void sequence_next(struct sequence *self)
   self->current = self->current->next;
   if (self->current == NULL)
   {
-    self->current = self->first;
+    self->current = self->first;  //mettre cette ligne en commentaire pour vérifier l'efficacité du parcours de recherche
     fprintf(stderr, "Répétition de la séquence\n");
   }
 }
@@ -107,6 +117,7 @@ void set_mine(struct map *self, int x, int y)
 */
 void process(struct sequence *sequence, struct info *info, struct map *map, char buffer[BUFSIZE])
 {
+  //Pour chaque direction, vérifie si un tir est nécessaire
   if (info->coord.y - info->N < 0){info->N = -1;}
   if (!map_shootable(map, info->coord.x, info->coord.y - info->N)){info->N = -1;}
 
@@ -120,29 +131,30 @@ void process(struct sequence *sequence, struct info *info, struct map *map, char
   if (!map_shootable(map, info->coord.x - info->W, info->coord.y)){info->W = -1;}
 
 
-
+  //Suppression des informations si les 4 directions d'info ont déjà été explorées
   if (info->N + info->S + info->W + info->E == -4 && info->coord.x != -1)
   {
     info_init(info);
   }
 
-
-
-  if (info->coord.x == -1 && info->coord.y == -1)
+  if (info->coord.x == -1 && info->coord.y == -1) //info->coord(-1,-1) <=> absence d'information
   {
-    /*
-    PHASE DE RECHERCHE
-    */
+    /*******************
+    *PHASE DE RECHERCHE*
+    ********************/
+
+
+    //Effectue l'action correspondant au noeud courant
     switch (sequence->current->action)
     {
-      if (!map_shootable(map, sequence->current->target.x, sequence->current->target.y))
-      {
-        sequence_next(sequence);
-        process(sequence, info, map, buffer);
-      }
-
       case SHOOT:
       {
+        //Passe au noeud suivant si le noeud courant est sans intérêt
+        if (!map_shootable(map, sequence->current->target.x, sequence->current->target.y))
+        {
+          sequence_next(sequence);
+          process(sequence, info, map, buffer);
+        }
         send_action(SHOOT);
         send_coord(&(sequence->current->target));
         fgets(buffer, BUFSIZE, stdin);
@@ -182,8 +194,8 @@ void process(struct sequence *sequence, struct info *info, struct map *map, char
 
       case MOVE :
       {
-        send_action(MOVE);
-        send_coord(&(sequence->current->target));
+        send_action(SHOOT);
+        send_coord_explicit(2,2);
         sequence_next(sequence);
 
       }
@@ -194,9 +206,9 @@ void process(struct sequence *sequence, struct info *info, struct map *map, char
   else
   {
 
-    /*
-    PHASE DE DESTRUCTION
-    */
+    /********************
+    PHASE DE DESTRUCTION*
+    *********************/
     if (!info->center_shot)
     {
       send_action(SHOOT);

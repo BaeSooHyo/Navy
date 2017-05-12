@@ -3,12 +3,10 @@
 #include "command.h"
 #include "intel.h"
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <signal.h>
 #include <time.h>
 
 /*
@@ -16,7 +14,7 @@ Grille 10x10
 x : A-J
 y : 0-9
 5 mines
-5 navires : 5 4 3 3 2
+5 navires : 5 4 4 3 2
 3 actions : SHOOT POLL MOVE
 */
 
@@ -36,10 +34,12 @@ int main(int argc, char const *argv[])
   set_mine(&ennemy_navy, 4, 6); //D6
 
   // bataux
+  //Tirage au sort d'une disposition de bateaux parmi 4 possibilités
+  //Les dispositions sont crées selon un motif de base, qui est modifié par miroir
   srand(time(NULL));
   int hasard = rand();
   fprintf(stderr, "%d\n", hasard);
-  if(hasard % 3 == 0)
+  if(hasard % 4 == 0)
   {
     printf("C0C4\n");
     fgets(buffer, BUFSIZE, stdin);
@@ -53,7 +53,21 @@ int main(int argc, char const *argv[])
     fgets(buffer, BUFSIZE, stdin);
     fprintf(stderr, "Disposition n°1\n");
   }
-  else if (hasard % 3 == 1)
+  else if(hasard % 4 == 1)
+  {
+    printf("C9C5\n");
+    fgets(buffer, BUFSIZE, stdin);
+    printf("H4E4\n");
+    fgets(buffer, BUFSIZE, stdin);
+    printf("F3F1\n");
+    fgets(buffer, BUFSIZE, stdin);
+    printf("H3H1\n");
+    fgets(buffer, BUFSIZE, stdin);
+    printf("B7B6\n");
+    fgets(buffer, BUFSIZE, stdin);
+    fprintf(stderr, "Disposition n°1\n");
+  }
+  else if (hasard % 4 == 2)
   {
     printf("H9H5\n");
     fgets(buffer, BUFSIZE, stdin);
@@ -86,6 +100,7 @@ int main(int argc, char const *argv[])
   struct sequence attack;
   sequence_create(&attack);
 
+  //Partie de base du parcours de recherche
   sequence_add_back(&attack, POLL,    4,   4);  //E4
   sequence_add_back(&attack, POLL,    4,   1);  //E1
   sequence_add_back(&attack, POLL,    7,   1);  //H1
@@ -97,12 +112,16 @@ int main(int argc, char const *argv[])
   sequence_add_back(&attack, POLL,    1,   5);  //B5
   sequence_add_back(&attack, POLL,    1,   2);  //B2
 
+  //Parcours supplémentaire du parcours de recherche
+  //Dans le cas où des bateaux ennemis sont placés côte à côte
+  //il est possible que certaines cases soient protégées de la recherche
   sequence_add_back(&attack, SHOOT,   6,   4);  //G4
-
   sequence_add_back(&attack, POLL,    1,   1);  //B1
   sequence_add_back(&attack, POLL,    8,   1);  //I1
   sequence_add_back(&attack, POLL,    8,   8);  //I8
   sequence_add_back(&attack, POLL,    1,   8);  //B8
+
+  sequence_next(&attack);
 
   struct info info;
   info_create(&info);
@@ -113,6 +132,7 @@ int main(int argc, char const *argv[])
     fprintf(stderr, "%s", buffer);
   }
 
+  //Boucle de jeu
   for (size_t i = 1; ; i++)
   {
     fprintf(stderr, "\n[-- Round %lu --]\n", i);

@@ -1,7 +1,7 @@
 #ifndef INTEL_H
 #define  INTEL_H
 
-#include "intel.h"
+// #include "intel.h"
 
 #include <stdbool.h>
 
@@ -26,10 +26,10 @@ struct map
 struct info
 {
   struct coord coord;
-  int N;
-  int S;
-  int E;
-  int W;
+  int N;                //Nord
+  int S;                //Sud
+  int E;                //Est
+  int W;                //Ouest
   bool center_shot;
 
 };
